@@ -118,6 +118,7 @@ def getCol(chrome):
     clock = chrome.find(By.CLASS_NAME, "clock-component")
     clockData = clock.get_attribute("class")
 
+
     if "clock-bottom" in clockData:
         if "clock-white" in clockData:
             return "w"
@@ -129,42 +130,48 @@ def getCol(chrome):
         else:
             return "w"
 
-def reverse(s):
-    str = ""
-    for i in s:
-        str = i + str
-    return str
+def checkTurn(chrome):
+    clock = chrome.find(By.CLASS_NAME, "clock-bottom")
+    clockData = clock.get_attribute("class")
+    return "player-turn" in clockData
 
 def main():
     chrome = Chrome()
-    chrome.get('https://www.chess.com/play')
-    print(dir(chrome))
+    chrome.get('https://www.chess.com/play/online')
+    #print(dir(chrome))
 
     stockfish = Stockfish(enginepath)
 
     while 1:
         try:
-            while 1:
-                # get a list of all pieces
-                pieces = chrome.find_all(By.CLASS_NAME, "piece")
+            # get a list of all pieces
+            pieces = chrome.find_all(By.CLASS_NAME, "piece")
 
-                # true - white, false - black
-                color = getCol(chrome)
+            # true - white, false - black
+            color = getCol(chrome)
 
-                fen = ""
-                if len(pieces) > 0:
-                    fen = get_fen(pieces)
+            fen = ""
+            if len(pieces) > 0:
+                fen = get_fen(pieces)
 
-                # print(f"querying with {fen} {color}")
+            # print(f"querying with {fen} {color}")
 
-                if keyboard.is_pressed('q'):
+            if keyboard.is_pressed('q'):
+                if checkTurn(chrome):
                     stockfish.set_fen_position(f"{fen} {color}")
-                    print(stockfish.get_top_moves(suggestions))
+                    # print(stockfish.get_top_moves(suggestions))
+                    moves = stockfish.get_top_moves(suggestions)
+                    print()
+                    for i in range(len(moves)):
+                        print(moves[i])
 
-
+                else:
+                    print("It is not your turn")
 
         except Exception as e:
-            print(e)
+            if e == "The Stockfish process has crashed":
+                print(e)
+                stockfish = Stockfish(enginepath)
 
 if __name__ == '__main__':
     main()
