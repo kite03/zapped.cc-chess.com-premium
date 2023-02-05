@@ -1,8 +1,10 @@
+import imgui
 from selenium.webdriver.common.by import By
 from selenium_chrome import Chrome
 from stockfish import Stockfish
 import keyboard
 import operator
+import tkinter as tk
 
 enginepath = "/Users/darre/Documents/Engines/Stockfish15"
 suggestions = 3
@@ -157,19 +159,14 @@ def main():
             # print(f"querying with {fen} {color}")
 
             if keyboard.is_pressed('q'):
-                if checkTurn(chrome):
-                    stockfish.set_fen_position(f"{fen} {color}")
-                    # print(stockfish.get_top_moves(suggestions))
-                    moves = stockfish.get_top_moves(suggestions)
-                    print()
-                    for i in range(len(moves)):
-                        print(moves[i])
-
-                else:
-                    print("It is not your turn")
-
+                #if checkTurn(chrome):
+                stockfish.set_fen_position(f"{fen} {color}")
+                # print(stockfish.get_top_moves(suggestions))
+                moves = stockfish.get_top_moves(suggestions)
+                print()
+                for i in range(len(moves)):
+                    print(moves[i])
         except Exception as e:
-            if e == "The Stockfish process has crashed":
                 print(e)
                 stockfish = Stockfish(enginepath)
 
